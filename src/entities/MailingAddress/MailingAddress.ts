@@ -25,8 +25,4 @@ export class MailingAddress extends FoundationEntity {
   @Field(() => Person)
   @OneToOne(() => Person, (p) => p.mailingAddress)
   person: Person;
-
-  @Column()
-  @Field()
-  personId: string;
 }

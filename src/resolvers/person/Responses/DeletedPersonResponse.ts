@@ -1,5 +1,4 @@
-import { Person } from "../../../entities/Person/Person";
-import { ObjectType, Field } from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class DeletedPersonResponse {

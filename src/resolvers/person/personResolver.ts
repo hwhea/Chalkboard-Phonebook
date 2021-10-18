@@ -1,3 +1,5 @@
+import { MailingAddress } from "../../entities/MailingAddress/MailingAddress";
+import { PhoneNumber } from "../../entities/PhoneNumber/PhoneNumber";
 import {
   Arg,
   Authorized,
@@ -13,6 +15,7 @@ import { PersonInput } from "./Inputs/PersonInput";
 import { DeletedPersonResponse } from "./Responses/DeletedPersonResponse";
 import { PaginatedPeopleResponse } from "./Responses/PaginatedPeopleResponse";
 import { PersonResponse } from "./Responses/PersonResponse";
+import { WritePersonResponse } from "./Responses/WritePersonResponse";
 import { validatePersonInput } from "./utils/validatePersonInput";
 
 @Resolver(Person)
@@ -41,16 +44,63 @@ export class PersonResolver {
     };
   }
 
-  @Mutation(() => PersonResponse)
+  @Mutation(() => WritePersonResponse)
   @Authorized()
   async createPerson(
     @Arg("personInput") input: PersonInput
-  ): Promise<PersonResponse> {
+  ): Promise<WritePersonResponse> {
     const validationErrors = validatePersonInput(input);
 
-    return {
-      error: "Not set up yet.",
-    };
+    if (validationErrors.length > 0) {
+      return { fieldErrors: validationErrors };
+    }
+
+    const newPerson = new Person();
+
+    try {
+      newPerson.firstName = input.firstName ?? newPerson.firstName;
+      newPerson.lastName = input.lastName ?? newPerson.lastName;
+      newPerson.emailAddress = input.email ?? newPerson.emailAddress;
+    } catch (e) {
+      console.error(e);
+      return { error: "Error updating general information." };
+    }
+
+    try {
+      newPerson.mailingAddress = new MailingAddress();
+      newPerson.mailingAddress.addressLine1 = input.address.addressLine1;
+      newPerson.mailingAddress.addressLine2 = input.address.addressLine2;
+      newPerson.mailingAddress.city = input.address.city;
+      newPerson.mailingAddress.postcode = input.address.postcode;
+    } catch (e) {
+      console.error(e);
+      return { error: "Error creating mailing address." };
+    }
+
+    try {
+      newPerson.phoneNumbers = input.phoneNumbers.map((inputNum) => {
+        const pn = new PhoneNumber();
+
+        pn.countryCode = inputNum.countryCode;
+        pn.number = inputNum.number;
+        pn.numberType = inputNum.numberType;
+
+        return pn;
+      });
+    } catch (e) {
+      console.error(e);
+      return { error: "Error creating phone numbers." };
+    }
+
+    try {
+      await newPerson.save();
+      return {
+        person: newPerson,
+      };
+    } catch (e) {
+      console.error(e);
+      return { error: "There was an unexpected error." };
+    }
   }
 
   @Mutation(() => PaginatedPeopleResponse)

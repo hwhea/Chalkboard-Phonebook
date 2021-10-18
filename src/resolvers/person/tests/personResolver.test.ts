@@ -1,9 +1,6 @@
-import { v4 } from "uuid";
 import { PersonResolver } from "../personResolver";
 
 const resolver = new PersonResolver();
-
-const mockPersonId = v4();
 
 it("Return an error when an incorrect user ID is provided.", async () => {
   expect.assertions(1);

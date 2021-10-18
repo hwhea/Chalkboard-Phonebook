@@ -1,6 +1,5 @@
-import { Address } from "cluster";
 import { Field, ObjectType } from "type-graphql";
-import { Column, Entity, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { FoundationEntity } from "../FoundationEntity";
 import { MailingAddress } from "../MailingAddress/MailingAddress";
 import { PhoneNumber } from "../PhoneNumber/PhoneNumber";
@@ -17,7 +16,7 @@ export class Person extends FoundationEntity {
   lastName: string;
 
   @Field(() => [PhoneNumber])
-  @OneToMany(() => PhoneNumber, (pn) => pn.person)
+  @OneToMany(() => PhoneNumber, (pn) => pn.person, { cascade: true })
   phoneNumbers: PhoneNumber[];
 
   @Field()
@@ -25,6 +24,10 @@ export class Person extends FoundationEntity {
   emailAddress: string;
 
   @Field(() => MailingAddress)
-  @OneToOne(() => MailingAddress, (ad) => ad.person)
-  mailingAddress: Address;
+  @OneToOne(() => MailingAddress, (ad) => ad.person, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn()
+  mailingAddress: MailingAddress;
 }
