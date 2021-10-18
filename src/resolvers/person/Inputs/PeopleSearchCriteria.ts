@@ -7,9 +7,7 @@ export class PeopleSearchCriteria {
   @Field({ nullable: true })
   phoneNumberContains?: string;
   @Field({ nullable: true })
-  addressContains?: string;
-  @Field(() => String, { nullable: true })
-  staffRole?: string;
+  postcodeContains?: string;
   @Field(() => Int)
   limit: number;
   @Field(() => Int, { nullable: true })

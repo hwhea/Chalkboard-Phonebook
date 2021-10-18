@@ -17,6 +17,7 @@ import { PaginatedPeopleResponse } from "./Responses/PaginatedPeopleResponse";
 import { PersonResponse } from "./Responses/PersonResponse";
 import { WritePersonResponse } from "./Responses/WritePersonResponse";
 import { validatePersonInput } from "./utils/validatePersonInput";
+import { getConnection } from "typeorm";
 
 @Resolver(Person)
 export class PersonResolver {
@@ -28,8 +29,16 @@ export class PersonResolver {
   @Query(() => PersonResponse)
   @Authorized()
   async getPerson(@Arg("personId") personId: string): Promise<PersonResponse> {
+    const person = await Person.findOne(personId);
+
+    if (!person) {
+      return {
+        error: "Not found.",
+      };
+    }
+
     return {
-      error: "Not set up yet for " + personId,
+      person,
     };
   }
 
@@ -38,10 +47,68 @@ export class PersonResolver {
   async getPeople(
     @Arg("searchCriteria") searchCriteria: PeopleSearchCriteria
   ): Promise<PaginatedPeopleResponse> {
-    return {
-      staff: [],
-      error: "Not set up yet.",
-    };
+    // Fixed limit of 50 people
+    const actualLimit = Math.min(searchCriteria.limit, 50);
+    const realLimitPlusOne = actualLimit + 1;
+
+    let qb = getConnection()
+      .getRepository(Person)
+      .createQueryBuilder("person")
+      .select();
+
+    qb = qb
+      .leftJoinAndSelect("person.mailingAddress", "addr")
+      .leftJoinAndSelect("person.phoneNumbers", "num");
+
+    if (searchCriteria.nameContains && searchCriteria.nameContains.length > 0) {
+      qb = qb.andWhere(
+        `(LOWER(person.firstName) LIKE :search OR LOWER(person.lastName) LIKE :search)`,
+        { search: `%${searchCriteria.nameContains.toLowerCase()}%` }
+      );
+    }
+
+    if (
+      searchCriteria.postcodeContains &&
+      searchCriteria.postcodeContains.length > 0
+    ) {
+      qb = qb.andWhere(`(LOWER(addr.postcode) LIKE :search)`, {
+        search: `%${searchCriteria.postcodeContains.toLowerCase()}%`,
+      });
+    }
+
+    if (
+      searchCriteria.phoneNumberContains &&
+      searchCriteria.phoneNumberContains.length > 0
+    ) {
+      qb = qb.andWhere(
+        `(LOWER(num.number) LIKE :search) OR (LOWER(num.countryCode) LIKE :search)`,
+        {
+          search: `%${searchCriteria.phoneNumberContains.toLowerCase()}%`,
+        }
+      );
+    }
+
+    if (searchCriteria.cursor) {
+      qb = qb.skip(searchCriteria.cursor);
+    }
+
+    qb = qb.orderBy(`person.lastName`, `DESC`).take(realLimitPlusOne);
+
+    const res = await qb.getMany();
+
+    try {
+      if (res) {
+        return {
+          staff: res.slice(0, actualLimit),
+          hasMore: res.length === realLimitPlusOne,
+        };
+      } else {
+        throw "An error occurred on the server.";
+      }
+    } catch (e) {
+      console.error(e);
+      return { error: "An error occurred on the server.", staff: [] };
+    }
   }
 
   @Mutation(() => WritePersonResponse)

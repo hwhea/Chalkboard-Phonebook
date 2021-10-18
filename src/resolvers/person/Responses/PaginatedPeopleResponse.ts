@@ -4,7 +4,7 @@ import { Field, ObjectType } from "type-graphql";
 @ObjectType()
 export class PaginatedPeopleResponse {
   @Field(() => [Person])
-  staff: Person[];
+  people: Person[];
 
   @Field({ nullable: true })
   hasMore?: boolean;
