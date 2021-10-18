@@ -99,7 +99,7 @@ export class PersonResolver {
     try {
       if (res) {
         return {
-          staff: res.slice(0, actualLimit),
+          people: res.slice(0, actualLimit),
           hasMore: res.length === realLimitPlusOne,
         };
       } else {
@@ -107,7 +107,7 @@ export class PersonResolver {
       }
     } catch (e) {
       console.error(e);
-      return { error: "An error occurred on the server.", staff: [] };
+      return { error: "An error occurred on the server.", people: [] };
     }
   }
 
@@ -170,14 +170,13 @@ export class PersonResolver {
     }
   }
 
-  @Mutation(() => PaginatedPeopleResponse)
+  @Mutation(() => PersonResponse)
   @Authorized()
   async updatePerson(
     @Arg("personId") personId: string,
-    @Arg("personInput") input: PeopleSearchCriteria
-  ): Promise<PaginatedPeopleResponse> {
+    @Arg("personInput") input: PersonInput
+  ): Promise<PersonResponse> {
     return {
-      staff: [],
       error: "Not set up yet.",
     };
   }
@@ -187,8 +186,18 @@ export class PersonResolver {
   async deletePerson(
     @Arg("personId") personId: string
   ): Promise<DeletedPersonResponse> {
-    return {
-      error: "Not set up yet.",
-    };
+    const person = await Person.findOne(personId);
+
+    if (!person) {
+      return { error: "Not found." };
+    }
+
+    try {
+      await person.remove();
+      return { deletedId: personId };
+    } catch (e) {
+      console.error(e);
+      return { error: "Person deleted" };
+    }
   }
 }
