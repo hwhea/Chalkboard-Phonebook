@@ -15,3 +15,5 @@ The plan is to create a GraphQL API that fulfills all requirements set out in th
 21:38 - Initial commit
 22:15 - Fully set up, basic entities, confirmed resolvers working.
 22:28 - Adding support for pagination and multiple people.
+22:32 - Quick break.
+22:47 - Resume
