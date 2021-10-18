@@ -2,6 +2,9 @@ import cors from "cors";
 import "dotenv-safe/config";
 import express from "express";
 import { createConnection } from "typeorm";
+import { MailingAddress } from "./entities/MailingAddress/MailingAddress";
+import { Person } from "./entities/Person/Person";
+import { PhoneNumber } from "./entities/PhoneNumber/PhoneNumber";
 
 const __prod__ = process.env.NODE_ENV === "production";
 
@@ -14,7 +17,7 @@ const main = async () => {
     password: process.env.DATABASE_PASSWORD,
     logging: !__prod__,
     synchronize: true,
-    entities: [],
+    entities: [MailingAddress, Person, PhoneNumber],
   });
 
   conn;
