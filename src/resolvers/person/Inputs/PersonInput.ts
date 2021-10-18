@@ -6,13 +6,7 @@ export class PersonInput {
   firstName?: string;
   @Field({ nullable: true })
   lastName?: string;
-
   @Field({ nullable: true })
-  addressContains?: string;
-  @Field(() => String, { nullable: true })
-  staffRole?: string;
-  @Field(() => Int)
-  limit: number;
-  @Field(() => Int, { nullable: true })
-  cursor?: number;
+  email?: string;
+  // TODO:EXPANSION: add more to this input
 }

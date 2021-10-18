@@ -9,9 +9,11 @@ import {
 } from "type-graphql";
 import { Person } from "../../entities/Person/Person";
 import { PeopleSearchCriteria } from "./Inputs/PeopleSearchCriteria";
+import { PersonInput } from "./Inputs/PersonInput";
 import { DeletedPersonResponse } from "./Responses/DeletedPersonResponse";
 import { PaginatedPeopleResponse } from "./Responses/PaginatedPeopleResponse";
 import { PersonResponse } from "./Responses/PersonResponse";
+import { validatePersonInput } from "./utils/validatePersonInput";
 
 @Resolver(Person)
 export class PersonResolver {
@@ -39,13 +41,14 @@ export class PersonResolver {
     };
   }
 
-  @Mutation(() => PaginatedPeopleResponse)
+  @Mutation(() => PersonResponse)
   @Authorized()
   async createPerson(
-    @Arg("personInput") input: PeopleSearchCriteria
-  ): Promise<PaginatedPeopleResponse> {
+    @Arg("personInput") input: PersonInput
+  ): Promise<PersonResponse> {
+    const validationErrors = validatePersonInput(input);
+
     return {
-      staff: [],
       error: "Not set up yet.",
     };
   }
