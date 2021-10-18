@@ -10,7 +10,11 @@ import { PhoneNumber } from "../PhoneNumber/PhoneNumber";
 export class Person extends FoundationEntity {
   @Field()
   @Column()
-  name: string;
+  firstName: string;
+
+  @Field()
+  @Column()
+  lastName: string;
 
   @Field(() => [PhoneNumber])
   @OneToMany(() => PhoneNumber, (pn) => pn.person)
