@@ -1,4 +1,4 @@
-import { InputType, Field, Int } from "type-graphql";
+import { Field, InputType } from "type-graphql";
 import { AddressInput } from "./AddressInput";
 import { PhoneNumberInput } from "./PhoneNumberInput";
 

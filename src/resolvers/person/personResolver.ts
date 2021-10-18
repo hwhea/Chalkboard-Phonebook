@@ -1,5 +1,3 @@
-import { MailingAddress } from "../../entities/MailingAddress/MailingAddress";
-import { PhoneNumber } from "../../entities/PhoneNumber/PhoneNumber";
 import {
   Arg,
   Authorized,
@@ -9,7 +7,10 @@ import {
   Resolver,
   Root,
 } from "type-graphql";
+import { getConnection } from "typeorm";
+import { MailingAddress } from "../../entities/MailingAddress/MailingAddress";
 import { Person } from "../../entities/Person/Person";
+import { PhoneNumber } from "../../entities/PhoneNumber/PhoneNumber";
 import { PeopleSearchCriteria } from "./Inputs/PeopleSearchCriteria";
 import { PersonInput } from "./Inputs/PersonInput";
 import { DeletedPersonResponse } from "./Responses/DeletedPersonResponse";
@@ -17,7 +18,6 @@ import { PaginatedPeopleResponse } from "./Responses/PaginatedPeopleResponse";
 import { PersonResponse } from "./Responses/PersonResponse";
 import { WritePersonResponse } from "./Responses/WritePersonResponse";
 import { validatePersonInput } from "./utils/validatePersonInput";
-import { getConnection } from "typeorm";
 
 @Resolver(Person)
 export class PersonResolver {
@@ -170,16 +170,17 @@ export class PersonResolver {
     }
   }
 
-  @Mutation(() => PersonResponse)
-  @Authorized()
-  async updatePerson(
-    @Arg("personId") personId: string,
-    @Arg("personInput") input: PersonInput
-  ): Promise<PersonResponse> {
-    return {
-      error: "Not set up yet.",
-    };
-  }
+  // RAN OUT OF TIME TO IMPLEMENT
+  // @Mutation(() => PersonResponse)
+  // @Authorized()
+  // async updatePerson(
+  //   @Arg("personId") personId: string,
+  //   @Arg("personInput") input: PersonInput
+  // ): Promise<PersonResponse> {
+  //   return {
+  //     error: "Not set up yet.",
+  //   };
+  // }
 
   @Mutation(() => PaginatedPeopleResponse)
   @Authorized()
