@@ -1,10 +1,13 @@
+import { ApolloServer } from "apollo-server-express";
 import cors from "cors";
 import "dotenv-safe/config";
 import express from "express";
+import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { MailingAddress } from "./entities/MailingAddress/MailingAddress";
 import { Person } from "./entities/Person/Person";
 import { PhoneNumber } from "./entities/PhoneNumber/PhoneNumber";
+import { PersonResolver } from "./resolvers/person/personResolver";
 
 const __prod__ = process.env.NODE_ENV === "production";
 
@@ -33,19 +36,23 @@ const main = async () => {
   );
   console.log("Server cors policy: " + process.env.CORS_ORIGIN);
 
-  // const apolloServer = new ApolloServer({
-  //   schema: await buildSchema({
-  //     resolvers: [],
-  //     validate: false,
-  //     // authChecker:
-  //   }),
-  //   context: ({ req, res }) => ({
-  //     req,
-  //     res,
-  //   }),
-  // });
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [PersonResolver],
+      validate: false,
+      authChecker: () => {
+        return true;
+      },
+    }),
+    context: ({ req, res }) => ({
+      req,
+      res,
+    }),
+  });
 
-  // apolloServer.applyMiddleware({ app, cors: false });
+  await apolloServer.start();
+
+  apolloServer.applyMiddleware({ app, cors: false });
 
   // Health check
   app.get("/", (_, res) => {
