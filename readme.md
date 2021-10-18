@@ -12,3 +12,4 @@ The plan is to create a GraphQL API that fulfills all requirements set out in th
 20:33 - Started project setup, readme, configs, environment, TS.
 20:50 - Deliveroo arrived, break to eat.
 21:35 - Back from dinner, resuming setting up w/ tests.
+21:38 - Initial commit
